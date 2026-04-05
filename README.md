@@ -4,6 +4,11 @@ Backend implementation for issue `#9` lives in [`backend/`](/home/nhtony318/.wor
 
 Frontend implementation for issue `#10` lives in [`frontend/`](/home/nhtony318/.worktrees/test_operator/tes-8/frontend).
 
+Release-readiness artifacts for issue `#12` live in:
+- [`docs/DEPLOYMENT_CHECKLIST.md`](/home/nhtony318/.worktrees/test_operator/tes-10/docs/DEPLOYMENT_CHECKLIST.md)
+- [`docs/OPERATIONS.md`](/home/nhtony318/.worktrees/test_operator/tes-10/docs/OPERATIONS.md)
+- [`docs/HANDOVER.md`](/home/nhtony318/.worktrees/test_operator/tes-10/docs/HANDOVER.md)
+
 ## Backend
 
 Stack:
@@ -13,11 +18,17 @@ Stack:
 - In-memory repository adapter for phase 2 build/test coverage
 - Vitest + Supertest
 
+Environment template:
+
+```bash
+cp backend/.env.example backend/.env
+```
+
 Run locally:
 
 ```bash
 cd backend
-npm install
+npm ci
 npm start
 ```
 
@@ -27,7 +38,7 @@ Development mode:
 
 ```bash
 cd backend
-npm install
+npm ci
 npm run dev
 ```
 
@@ -35,7 +46,7 @@ Run tests:
 
 ```bash
 cd backend
-npm install
+npm ci
 npm test
 ```
 
@@ -43,8 +54,14 @@ Build:
 
 ```bash
 cd backend
-npm install
+npm ci
 npm run build
+```
+
+Health check:
+
+```bash
+curl http://localhost:3000/health
 ```
 
 Implemented endpoints:
@@ -64,7 +81,7 @@ Implemented endpoints:
 ```bash
 cd frontend
 cp .env.example .env
-npm install
+npm ci
 npm run dev
 ```
 
@@ -74,6 +91,7 @@ Default frontend API base URL is `/api/v1`. Override it with `VITE_API_BASE_URL`
 
 ```bash
 cd frontend
+npm ci
 npm run lint
 npm run test
 npm run build

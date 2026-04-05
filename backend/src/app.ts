@@ -6,6 +6,7 @@ import { ZodError } from "zod";
 
 import { ApiError, unauthenticatedError } from "./common/errors";
 import { SESSION_COOKIE_NAME } from "./common/http";
+import { AppLogger } from "./common/logger";
 import {
   createTodoSchema,
   dashboardQuerySchema,
@@ -20,6 +21,7 @@ import { DashboardService } from "./services/dashboard-service";
 import { TodoService } from "./services/todo-service";
 import { InMemoryStore } from "./store/in-memory-store";
 import { RequestUser } from "./types";
+import { AppConfig } from "./config";
 
 declare global {
   namespace Express {
@@ -33,6 +35,8 @@ declare global {
 
 type AppDependencies = {
   store?: InMemoryStore;
+  config?: AppConfig;
+  logger?: AppLogger;
 };
 
 const sessionCookieConfig = {
@@ -44,6 +48,8 @@ const sessionCookieConfig = {
 
 export const createApp = (dependencies: AppDependencies = {}) => {
   const store = dependencies.store ?? new InMemoryStore();
+  const config = dependencies.config;
+  const logger = dependencies.logger;
   const authService = new AuthService(store);
   const todoService = new TodoService(store);
   const dashboardService = new DashboardService(store, todoService);
@@ -53,9 +59,38 @@ export const createApp = (dependencies: AppDependencies = {}) => {
 
   app.use(express.json());
   app.use(cookieParser());
+  app.use((req, res, next) => {
+    const startedAt = process.hrtime.bigint();
+    res.on("finish", () => {
+      const durationMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000;
+      logger?.info("request.completed", {
+        requestId: req.requestId,
+        method: req.method,
+        path: req.originalUrl,
+        statusCode: res.statusCode,
+        durationMs: Number(durationMs.toFixed(2)),
+      });
+    });
+    next();
+  });
   app.use((req, _res, next) => {
     req.requestId = `req_${randomUUID()}`;
     next();
+  });
+  app.use((req, res, next) => {
+    res.setHeader("x-request-id", req.requestId);
+    next();
+  });
+
+  app.get("/health", (_req, res) => {
+    res.status(200).json({
+      data: {
+        status: "ok",
+        service: config?.serviceName ?? "todo-api",
+        environment: config?.appEnv ?? process.env.NODE_ENV ?? "development",
+        version: config?.releaseVersion ?? "dev",
+      },
+    });
   });
 
   const authenticate = (req: Request, _res: Response, next: NextFunction) => {
@@ -201,6 +236,13 @@ export const createApp = (dependencies: AppDependencies = {}) => {
 
   app.use((error: unknown, req: Request, res: Response, _next: NextFunction) => {
     if (error instanceof ApiError) {
+      logger?.warn("request.failed", {
+        requestId: req.requestId,
+        method: req.method,
+        path: req.originalUrl,
+        statusCode: error.statusCode,
+        errorCode: error.code,
+      });
       res.status(error.statusCode).json({
         error: {
           code: error.code,
@@ -212,6 +254,14 @@ export const createApp = (dependencies: AppDependencies = {}) => {
       return;
     }
 
+    logger?.error("request.crashed", {
+      requestId: req.requestId,
+      method: req.method,
+      path: req.originalUrl,
+      statusCode: 500,
+      errorName: error instanceof Error ? error.name : "UnknownError",
+      errorMessage: error instanceof Error ? error.message : "Unexpected error",
+    });
     res.status(500).json({
       error: {
         code: "INTERNAL_ERROR",

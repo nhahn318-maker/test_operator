@@ -2,9 +2,29 @@ import request from "supertest";
 import { describe, expect, it } from "vitest";
 
 import { createApp } from "../src/app";
+import { createLogger } from "../src/common/logger";
+import { getAppConfig } from "../src/config";
 import { InMemoryStore } from "../src/store/in-memory-store";
 
-const makeApp = () => createApp({ store: new InMemoryStore() });
+const makeApp = () =>
+  createApp({
+    store: new InMemoryStore(),
+    config: getAppConfig(),
+    logger: createLogger("error"),
+  });
+
+describe("release baseline", () => {
+  it("exposes a health endpoint without authentication", async () => {
+    const app = makeApp();
+
+    const response = await request(app).get("/health");
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.status).toBe("ok");
+    expect(response.body.data.service).toBe("todo-api");
+    expect(response.headers["x-request-id"]).toMatch(/^req_/);
+  });
+});
 
 describe("auth api", () => {
   it("registers, sets a cookie, resolves /me, and logs out", async () => {
