@@ -58,6 +58,11 @@ Frontend responsibilities:
 - Call backend APIs and display structured errors.
 - Avoid embedding business rules that belong on the server, except basic form validation and presentation logic.
 
+Frontend dependency rules:
+- Route modules depend on shared UI components and the API client, not on persistence concerns.
+- Session state is the single source of truth for whether protected routes may render.
+- Dashboard and todo views consume backend-derived data and should not recalculate ownership or security rules client-side.
+
 ### 5.2 Backend
 - Auth controller layer: register, login, logout, current-session fetch.
 - Todo controller layer: CRUD and completion transitions for authenticated users.
@@ -71,10 +76,25 @@ Backend responsibilities:
 - Enforce consistent error contracts and status codes.
 - Persist and query user, session, and todo data.
 
+Backend dependency rules:
+- Controllers map HTTP requests to typed service inputs and shape HTTP responses.
+- Services own business rules, resource ownership checks, and cross-module orchestration.
+- Repositories own storage queries and may not contain transport-specific response formatting.
+
 ### 5.3 Database
 - Stores canonical user, session, and todo records.
 - Enforces uniqueness, foreign keys, and ownership linkage.
 - Supports indexed queries for task listing and dashboard summary generation.
+
+### 5.4 Boundary Summary
+
+| Layer | Owns | Must not own |
+| --- | --- | --- |
+| Frontend routes/components | Rendering, local form state, optimistic UX decisions, route guards | Authorization rules, canonical business validation, persistence access |
+| API client/session layer | Request transport, cookie-aware session bootstrap, response parsing | Domain decisions, direct DOM rendering |
+| Backend controllers | HTTP parsing, auth middleware composition, response envelopes | Query details, reusable domain logic |
+| Backend services | Validation, task lifecycle rules, dashboard aggregation, ownership enforcement | HTTP-only concerns, browser state |
+| Repositories/database | Record storage, filtering, indexes, relational constraints | UI logic, session presentation |
 
 ## 6. Module View
 
@@ -179,6 +199,12 @@ Backend responsibilities:
 3. Backend returns metrics plus a prioritized recent-task subset.
 4. Frontend renders summary cards and task widgets.
 
+### 9.4 Protected Route Bootstrap
+1. Browser loads a protected route such as dashboard or todos.
+2. Frontend session bootstrap calls the current-session endpoint using the existing cookie.
+3. Backend validates the session record and returns the authenticated user or `401`.
+4. Frontend either renders the protected page or redirects to sign in.
+
 ## 10. Error Model
 
 ### 10.1 Principles
@@ -269,9 +295,9 @@ Backend responsibilities:
 
 ## 15. Acceptance Criteria For This Design
 
-- The system architecture cleanly separates frontend, backend, and data persistence concerns.
-- Component boundaries identify auth, dashboard, todo, and shared modules.
-- The design specifies a concrete data model for users, sessions, and todos.
-- Authentication and authorization behavior are defined for protected routes and resource ownership.
-- Error handling uses a normalized response shape and canonical codes.
-- The design is sufficient to support a follow-on implementation and detailed API contract.
+- The design separates frontend, backend, and persistence responsibilities clearly enough that implementation tasks can be split without redefining boundaries.
+- The component model identifies auth, dashboard, todo, session, and shared modules with clear dependency rules.
+- The entity model covers users, sessions, and todos with ownership constraints that support auth, dashboard, and CRUD requirements from `docs/PRD.md`.
+- The auth design defines session handling, password storage expectations, and unauthorized or hidden-resource behavior.
+- The error model defines a shared envelope and canonical codes that can be reused across all phase 1 endpoints.
+- The request flows and testing boundaries are specific enough to guide backend, frontend, and test issue follow-up work.
