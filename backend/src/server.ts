@@ -1,8 +1,18 @@
+import { createLogger } from "./common/logger";
+import { getAppConfig } from "./config";
 import { createApp } from "./app";
 
-const port = Number(process.env.PORT ?? 3000);
-const app = createApp();
+const config = getAppConfig();
+const logger = createLogger(config.logLevel, {
+  service: config.serviceName,
+  environment: config.appEnv,
+  version: config.releaseVersion,
+});
+const app = createApp({ config, logger });
 
-app.listen(port, () => {
-  console.log(`Backend server listening on http://localhost:${port}`);
+app.listen(config.port, () => {
+  logger.info("server.started", {
+    port: config.port,
+    url: `http://localhost:${config.port}`,
+  });
 });
