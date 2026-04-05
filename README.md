@@ -1,13 +1,13 @@
 # test_operator
 
-Backend implementation for issue `#3` lives in [`backend/`](/home/nhtony318/.worktrees/test_operator/tes-13/backend) and exposes the phase-2 auth, todo, and dashboard API described in [`docs/API_CONTRACT.md`](/home/nhtony318/.worktrees/test_operator/tes-13/docs/API_CONTRACT.md).
+Backend implementation for issue `#3` lives in [`backend/`](backend/) and exposes the phase-2 auth, todo, and dashboard API described in [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md).
 
-Frontend implementation for issue `#10` lives in [`frontend/`](/home/nhtony318/.worktrees/test_operator/tes-8/frontend).
+Frontend implementation for issue `#4` lives in [`frontend/`](frontend/).
 
-Release-readiness artifacts for issue `#12` live in:
-- [`docs/DEPLOYMENT_CHECKLIST.md`](/home/nhtony318/.worktrees/test_operator/tes-10/docs/DEPLOYMENT_CHECKLIST.md)
-- [`docs/OPERATIONS.md`](/home/nhtony318/.worktrees/test_operator/tes-10/docs/OPERATIONS.md)
-- [`docs/HANDOVER.md`](/home/nhtony318/.worktrees/test_operator/tes-10/docs/HANDOVER.md)
+Release-readiness artifacts for issue `#6` live in:
+- [`docs/DEPLOYMENT_CHECKLIST.md`](docs/DEPLOYMENT_CHECKLIST.md)
+- [`docs/OPERATIONS.md`](docs/OPERATIONS.md)
+- [`docs/HANDOVER.md`](docs/HANDOVER.md)
 
 ## Backend
 

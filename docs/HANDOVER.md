@@ -1,6 +1,6 @@
 # Handover Notes
 
-## 1. Delivered In Issue `#12`
+## 1. Delivered In Issue `#6`
 
 - Deployment checklist in `docs/DEPLOYMENT_CHECKLIST.md`
 - Environment templates at `.env.example`, `backend/.env.example`, and `frontend/.env.example`
