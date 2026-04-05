@@ -1,0 +1,511 @@
+# API Contract
+
+## 1. Purpose
+
+This document defines the phase 1 HTTP API contract for the Todo Fullstack Web App. It is intended to align frontend and backend implementation around stable request and response formats.
+
+## 2. Conventions
+
+### 2.1 Base Path
+- Base API path: `/api/v1`
+
+### 2.2 Content Type
+- Requests and responses use `application/json` unless otherwise stated.
+
+### 2.3 Authentication
+- Authenticated endpoints rely on a secure HTTP-only session cookie.
+- Clients should send credentials on same-origin requests.
+
+### 2.4 Timestamps
+- Timestamps use ISO 8601 UTC strings.
+
+### 2.5 Identifier Format
+- Resource identifiers use UUID strings.
+
+## 3. Shared Schemas
+
+### 3.1 User
+
+```json
+{
+  "id": "4db0e4a1-4fb6-4604-8dd6-dc2f7d27d0d9",
+  "email": "user@example.com",
+  "displayName": "Alex Doe",
+  "createdAt": "2026-04-05T10:00:00Z",
+  "updatedAt": "2026-04-05T10:00:00Z"
+}
+```
+
+### 3.2 Session
+
+```json
+{
+  "user": {
+    "id": "4db0e4a1-4fb6-4604-8dd6-dc2f7d27d0d9",
+    "email": "user@example.com",
+    "displayName": "Alex Doe",
+    "createdAt": "2026-04-05T10:00:00Z",
+    "updatedAt": "2026-04-05T10:00:00Z"
+  }
+}
+```
+
+### 3.3 Todo
+
+```json
+{
+  "id": "e5f73831-ef8e-45fd-ba07-6d2698c8906f",
+  "title": "Finish architecture draft",
+  "description": "Complete HLD and API contract documents.",
+  "status": "active",
+  "dueDate": "2026-04-10T00:00:00Z",
+  "completedAt": null,
+  "createdAt": "2026-04-05T10:30:00Z",
+  "updatedAt": "2026-04-05T10:30:00Z"
+}
+```
+
+### 3.4 Dashboard Summary
+
+```json
+{
+  "summary": {
+    "totalTodos": 12,
+    "activeTodos": 8,
+    "completedTodos": 4
+  },
+  "highPriorityTodos": [
+    {
+      "id": "e5f73831-ef8e-45fd-ba07-6d2698c8906f",
+      "title": "Finish architecture draft",
+      "description": "Complete HLD and API contract documents.",
+      "status": "active",
+      "dueDate": "2026-04-10T00:00:00Z",
+      "completedAt": null,
+      "createdAt": "2026-04-05T10:30:00Z",
+      "updatedAt": "2026-04-05T10:30:00Z"
+    }
+  ]
+}
+```
+
+### 3.5 Error Envelope
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Request body is invalid.",
+    "details": [
+      {
+        "field": "email",
+        "issue": "Must be a valid email address."
+      }
+    ],
+    "requestId": "req_123"
+  }
+}
+```
+
+## 4. Validation Rules
+
+### 4.1 Auth Inputs
+- `email`: required, valid email, normalized to lowercase.
+- `password`: required, minimum 8 characters.
+- `displayName`: optional, if provided should be 1 to 100 characters after trimming.
+
+### 4.2 Todo Inputs
+- `title`: required, 1 to 200 characters after trimming.
+- `description`: optional, maximum 2000 characters.
+- `status`: optional on create, allowed values `active` or `completed`.
+- `dueDate`: optional, ISO 8601 timestamp or `null`.
+
+## 5. Auth Endpoints
+
+### 5.1 Register
+- Method: `POST`
+- Path: `/api/v1/auth/register`
+- Auth: public
+
+Request body:
+
+```json
+{
+  "email": "user@example.com",
+  "password": "StrongPass123",
+  "displayName": "Alex Doe"
+}
+```
+
+Success response:
+- Status: `201 Created`
+- Sets session cookie.
+
+```json
+{
+  "data": {
+    "user": {
+      "id": "4db0e4a1-4fb6-4604-8dd6-dc2f7d27d0d9",
+      "email": "user@example.com",
+      "displayName": "Alex Doe",
+      "createdAt": "2026-04-05T10:00:00Z",
+      "updatedAt": "2026-04-05T10:00:00Z"
+    }
+  }
+}
+```
+
+Error responses:
+- `400 Bad Request`: invalid payload.
+- `409 Conflict`: email already exists.
+
+### 5.2 Login
+- Method: `POST`
+- Path: `/api/v1/auth/login`
+- Auth: public
+
+Request body:
+
+```json
+{
+  "email": "user@example.com",
+  "password": "StrongPass123"
+}
+```
+
+Success response:
+- Status: `200 OK`
+- Sets session cookie.
+
+```json
+{
+  "data": {
+    "user": {
+      "id": "4db0e4a1-4fb6-4604-8dd6-dc2f7d27d0d9",
+      "email": "user@example.com",
+      "displayName": "Alex Doe",
+      "createdAt": "2026-04-05T10:00:00Z",
+      "updatedAt": "2026-04-05T10:00:00Z"
+    }
+  }
+}
+```
+
+Error responses:
+- `400 Bad Request`: invalid payload.
+- `401 Unauthorized`: invalid credentials.
+
+### 5.3 Logout
+- Method: `POST`
+- Path: `/api/v1/auth/logout`
+- Auth: authenticated
+
+Success response:
+- Status: `204 No Content`
+- Clears session cookie.
+
+Error responses:
+- `401 Unauthorized`: no active session.
+
+### 5.4 Current Session
+- Method: `GET`
+- Path: `/api/v1/auth/me`
+- Auth: authenticated
+
+Success response:
+- Status: `200 OK`
+
+```json
+{
+  "data": {
+    "user": {
+      "id": "4db0e4a1-4fb6-4604-8dd6-dc2f7d27d0d9",
+      "email": "user@example.com",
+      "displayName": "Alex Doe",
+      "createdAt": "2026-04-05T10:00:00Z",
+      "updatedAt": "2026-04-05T10:00:00Z"
+    }
+  }
+}
+```
+
+Error responses:
+- `401 Unauthorized`: no valid session.
+
+## 6. Todo Endpoints
+
+### 6.1 List Todos
+- Method: `GET`
+- Path: `/api/v1/todos`
+- Auth: authenticated
+
+Query parameters:
+- `status`: optional, `active` or `completed`.
+- `limit`: optional, integer 1 to 100, default 20.
+- `cursor`: optional pagination cursor for forward paging.
+- `sort`: optional, allowed values `createdAt_desc`, `updatedAt_desc`, `dueDate_asc`.
+
+Success response:
+- Status: `200 OK`
+
+```json
+{
+  "data": {
+    "items": [
+      {
+        "id": "e5f73831-ef8e-45fd-ba07-6d2698c8906f",
+        "title": "Finish architecture draft",
+        "description": "Complete HLD and API contract documents.",
+        "status": "active",
+        "dueDate": "2026-04-10T00:00:00Z",
+        "completedAt": null,
+        "createdAt": "2026-04-05T10:30:00Z",
+        "updatedAt": "2026-04-05T10:30:00Z"
+      }
+    ],
+    "pageInfo": {
+      "nextCursor": null
+    }
+  }
+}
+```
+
+Error responses:
+- `400 Bad Request`: invalid query params.
+- `401 Unauthorized`: no valid session.
+
+### 6.2 Create Todo
+- Method: `POST`
+- Path: `/api/v1/todos`
+- Auth: authenticated
+
+Request body:
+
+```json
+{
+  "title": "Finish architecture draft",
+  "description": "Complete HLD and API contract documents.",
+  "dueDate": "2026-04-10T00:00:00Z"
+}
+```
+
+Success response:
+- Status: `201 Created`
+
+```json
+{
+  "data": {
+    "todo": {
+      "id": "e5f73831-ef8e-45fd-ba07-6d2698c8906f",
+      "title": "Finish architecture draft",
+      "description": "Complete HLD and API contract documents.",
+      "status": "active",
+      "dueDate": "2026-04-10T00:00:00Z",
+      "completedAt": null,
+      "createdAt": "2026-04-05T10:30:00Z",
+      "updatedAt": "2026-04-05T10:30:00Z"
+    }
+  }
+}
+```
+
+Error responses:
+- `400 Bad Request`: invalid payload.
+- `401 Unauthorized`: no valid session.
+
+### 6.3 Get Todo
+- Method: `GET`
+- Path: `/api/v1/todos/{todoId}`
+- Auth: authenticated
+
+Success response:
+- Status: `200 OK`
+
+```json
+{
+  "data": {
+    "todo": {
+      "id": "e5f73831-ef8e-45fd-ba07-6d2698c8906f",
+      "title": "Finish architecture draft",
+      "description": "Complete HLD and API contract documents.",
+      "status": "active",
+      "dueDate": "2026-04-10T00:00:00Z",
+      "completedAt": null,
+      "createdAt": "2026-04-05T10:30:00Z",
+      "updatedAt": "2026-04-05T10:30:00Z"
+    }
+  }
+}
+```
+
+Error responses:
+- `401 Unauthorized`: no valid session.
+- `404 Not Found`: todo does not exist or is not owned by the user.
+
+### 6.4 Update Todo
+- Method: `PATCH`
+- Path: `/api/v1/todos/{todoId}`
+- Auth: authenticated
+
+Request body:
+
+```json
+{
+  "title": "Finish HLD and API contract",
+  "description": "Update both documents with final review edits.",
+  "status": "completed",
+  "dueDate": null
+}
+```
+
+Patch semantics:
+- Partial updates are allowed.
+- Omitting a field leaves it unchanged.
+- Setting `status` to `completed` sets `completedAt` to the update timestamp if not already completed.
+- Setting `status` to `active` clears `completedAt`.
+
+Success response:
+- Status: `200 OK`
+
+```json
+{
+  "data": {
+    "todo": {
+      "id": "e5f73831-ef8e-45fd-ba07-6d2698c8906f",
+      "title": "Finish HLD and API contract",
+      "description": "Update both documents with final review edits.",
+      "status": "completed",
+      "dueDate": null,
+      "completedAt": "2026-04-05T11:00:00Z",
+      "createdAt": "2026-04-05T10:30:00Z",
+      "updatedAt": "2026-04-05T11:00:00Z"
+    }
+  }
+}
+```
+
+Error responses:
+- `400 Bad Request`: invalid payload.
+- `401 Unauthorized`: no valid session.
+- `404 Not Found`: todo does not exist or is not owned by the user.
+
+### 6.5 Delete Todo
+- Method: `DELETE`
+- Path: `/api/v1/todos/{todoId}`
+- Auth: authenticated
+
+Success response:
+- Status: `204 No Content`
+
+Error responses:
+- `401 Unauthorized`: no valid session.
+- `404 Not Found`: todo does not exist or is not owned by the user.
+
+## 7. Dashboard Endpoint
+
+### 7.1 Get Dashboard
+- Method: `GET`
+- Path: `/api/v1/dashboard`
+- Auth: authenticated
+
+Query parameters:
+- `priorityLimit`: optional, integer 1 to 10, default 5.
+
+Success response:
+- Status: `200 OK`
+
+```json
+{
+  "data": {
+    "summary": {
+      "totalTodos": 12,
+      "activeTodos": 8,
+      "completedTodos": 4
+    },
+    "highPriorityTodos": [
+      {
+        "id": "e5f73831-ef8e-45fd-ba07-6d2698c8906f",
+        "title": "Finish architecture draft",
+        "description": "Complete HLD and API contract documents.",
+        "status": "active",
+        "dueDate": "2026-04-10T00:00:00Z",
+        "completedAt": null,
+        "createdAt": "2026-04-05T10:30:00Z",
+        "updatedAt": "2026-04-05T10:30:00Z"
+      }
+    ]
+  }
+}
+```
+
+Selection rules:
+- Only the authenticated user's todos are considered.
+- Active todos should be returned before completed todos.
+- Within the same status group, sort by nearest due date if present, otherwise most recently updated first.
+
+Error responses:
+- `400 Bad Request`: invalid query params.
+- `401 Unauthorized`: no valid session.
+
+## 8. Error Contract
+
+### 8.1 Status Mapping
+- `400 Bad Request` -> `VALIDATION_ERROR`
+- `401 Unauthorized` -> `UNAUTHENTICATED`
+- `403 Forbidden` -> `FORBIDDEN`
+- `404 Not Found` -> `NOT_FOUND`
+- `409 Conflict` -> `CONFLICT`
+- `429 Too Many Requests` -> `RATE_LIMITED`
+- `500 Internal Server Error` -> `INTERNAL_ERROR`
+
+### 8.2 Example Unauthorized Response
+
+```json
+{
+  "error": {
+    "code": "UNAUTHENTICATED",
+    "message": "Authentication is required.",
+    "details": [],
+    "requestId": "req_456"
+  }
+}
+```
+
+### 8.3 Example Conflict Response
+
+```json
+{
+  "error": {
+    "code": "CONFLICT",
+    "message": "An account with this email already exists.",
+    "details": [
+      {
+        "field": "email",
+        "issue": "Already registered."
+      }
+    ],
+    "requestId": "req_789"
+  }
+}
+```
+
+## 9. Security Notes
+
+- Session cookies must be `HttpOnly` and `Secure` outside local development.
+- State-changing endpoints should include CSRF protection in implementation if the deployment model introduces cross-site request risk.
+- Auth endpoints should be eligible for rate limiting to reduce credential stuffing risk.
+- API responses must not expose password hashes, session tokens, or internal persistence identifiers beyond public resource IDs.
+
+## 10. Test Contract Expectations
+
+- Integration tests should assert the status code, payload shape, and cookie behavior for auth endpoints.
+- Todo tests should verify user isolation by attempting access across two different authenticated accounts.
+- Dashboard tests should verify count consistency after create, update, complete, and delete flows.
+- Error tests should assert the stable `error.code` values and field-level validation details.
+
+## 11. Acceptance Criteria For This Contract
+
+- The contract defines endpoint paths, methods, auth requirements, inputs, and outputs for auth, todos, and dashboard.
+- Shared resource schemas and validation rules are explicit enough for frontend and backend parallel work.
+- The error model is normalized across endpoints with stable machine-readable codes.
+- The contract captures ownership and authentication behavior required by the PRD.
