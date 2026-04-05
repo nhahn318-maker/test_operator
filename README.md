@@ -1,6 +1,6 @@
 # test_operator
 
-Backend implementation for issue `#9` lives in [`backend/`](/home/nhtony318/.worktrees/test_operator/tes-8/backend) and exposes the phase-2 auth, todo, and dashboard API described in [`docs/API_CONTRACT.md`](/home/nhtony318/.worktrees/test_operator/tes-8/docs/API_CONTRACT.md).
+Backend implementation for issue `#3` lives in [`backend/`](/home/nhtony318/.worktrees/test_operator/tes-13/backend) and exposes the phase-2 auth, todo, and dashboard API described in [`docs/API_CONTRACT.md`](/home/nhtony318/.worktrees/test_operator/tes-13/docs/API_CONTRACT.md).
 
 Frontend implementation for issue `#10` lives in [`frontend/`](/home/nhtony318/.worktrees/test_operator/tes-8/frontend).
 

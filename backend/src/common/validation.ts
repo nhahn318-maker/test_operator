@@ -55,7 +55,7 @@ export const listTodosQuerySchema = z.object({
   status: todoStatusSchema.optional(),
   limit: z.coerce.number().int().min(1).max(100).default(20),
   cursor: z.string().optional(),
-  sort: z.enum(["createdAt_desc", "updatedAt_desc", "dueDate_asc"]).default("createdAt_desc"),
+  sort: z.enum(["createdAt_desc", "updatedAt_desc", "dueDate_asc"]).default("updatedAt_desc"),
 });
 
 export const dashboardQuerySchema = z.object({
