@@ -74,4 +74,27 @@ describe('App', () => {
       expect(screen.getByText('completed')).toBeInTheDocument()
     })
   })
+
+  it('registers a new user and signs out back to login', async () => {
+    resetMockState({ authenticated: false })
+    const user = userEvent.setup()
+
+    render(<App />)
+
+    await screen.findByRole('heading', { name: /sign in to continue/i })
+    await user.click(screen.getByRole('link', { name: /create one/i }))
+
+    expect(await screen.findByRole('heading', { name: /start your workspace/i })).toBeInTheDocument()
+
+    await user.type(screen.getByLabelText(/display name/i), 'Taylor')
+    await user.type(screen.getByLabelText(/email/i), 'taylor@example.com')
+    await user.type(screen.getByLabelText(/password/i), 'StrongPass123')
+    await user.click(screen.getByRole('button', { name: /create account/i }))
+
+    expect(await screen.findByRole('heading', { name: /taylor's todo board/i })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /sign out/i }))
+
+    expect(await screen.findByRole('heading', { name: /sign in to continue/i })).toBeInTheDocument()
+  })
 })

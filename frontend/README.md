@@ -1,6 +1,6 @@
 # Frontend
 
-React + TypeScript + Vite frontend for the todo app contract defined in [`docs/API_CONTRACT.md`](/home/nhtony318/.worktrees/test_operator/tes-8/docs/API_CONTRACT.md).
+React + TypeScript + Vite frontend for the todo app contract defined in `../docs/API_CONTRACT.md`.
 
 ## Features
 
@@ -17,7 +17,7 @@ npm install
 npm run dev
 ```
 
-By default the app targets `/api/v1`. Set `VITE_API_BASE_URL` if the backend is served from another origin.
+By default the app targets `/api/v1`. Set `VITE_API_BASE_URL` if the backend is served from another origin, such as the local backend at `http://localhost:3000/api/v1`.
 
 ## Verify
 
