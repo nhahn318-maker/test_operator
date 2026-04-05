@@ -1,10 +1,10 @@
 # Deployment Checklist
 
-This checklist is the phase 4 release baseline for issue `#12`.
+This checklist is the phase 4 release baseline for issue `#6`.
 
 ## 1. Build Readiness
 
-- Confirm issue dependency `#11` is closed.
+- Confirm issue dependency `#5` is closed.
 - Confirm the release branch is cut from `main`.
 - Confirm the local verification commands pass:
   - `cd backend && npm ci && npm run build && npm test`
