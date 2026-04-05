@@ -1,141 +1,290 @@
 # Product Requirements Document
 
-## 1. Overview
+## 1. Document Purpose
 
-### 1.1 Product Name
+This document defines the phase 1 product requirements for a fullstack to do web application based on the prompt:
+
+`Tạo một web app to do list fullstack, có auth, dashboard, API, test`
+
+Phase 1 is limited to product definition. The output of this phase is a requirements artifact that can guide later architecture, API contract, implementation, and testing work. No production code is included in scope for this phase.
+
+## 2. Product Summary
+
+### 2.1 Working Name
 Todo Fullstack Web App
 
-### 1.2 Background
-The product is a web application that helps users manage personal tasks in one place. It includes authentication, a dashboard for daily task visibility, backend APIs for task operations, and a testing strategy to support delivery quality.
+### 2.2 Product Vision
+Provide a simple and reliable web application where users can securely manage personal tasks, view progress from a dashboard, and interact with the system through a maintainable API-backed architecture.
 
-### 1.3 Problem Statement
-Users need a simple and reliable way to create, organize, and track tasks across sessions. Basic note-taking tools do not provide structured task status management, authenticated access, or a consolidated dashboard view.
+### 2.3 Problem Statement
+Users often track personal tasks across notes, chat messages, or lightweight checklist tools that lack account security, structured task management, and a clear progress overview. A dedicated web application should allow users to store tasks securely, manage them efficiently, and understand their current workload at a glance.
 
-### 1.4 Goal
-Deliver a fullstack todo web application definition that supports secure sign-in, task management, dashboard visibility, API-driven architecture, and testability.
+### 2.4 Primary Goal
+Define a clear MVP for a single-user to do application with:
+- authentication,
+- task management,
+- dashboard visibility,
+- backend API support,
+- and a test strategy for critical flows.
 
-## 2. Scope
+## 3. Objectives And Success Criteria
 
-### 2.1 In Scope
-- User authentication for sign up, sign in, sign out, and protected access.
-- Task management for creating, viewing, updating, completing, and deleting todo items.
-- Dashboard view summarizing task counts and recent or relevant tasks.
-- Backend APIs to support authentication and todo CRUD flows.
-- Test coverage expectations for key frontend, backend, and integration behaviors.
-- Basic responsive web experience for desktop and mobile browsers.
+### 3.1 Business Objectives
+- Define an MVP small enough to implement quickly.
+- Ensure the requirements support a standard fullstack web architecture.
+- Reduce ambiguity for later design and implementation phases.
 
-### 2.2 Out of Scope
-- Team collaboration or shared task lists.
-- Real-time multi-user updates.
-- File attachments, comments, or reminders.
+### 3.2 User Objectives
+- Sign up and sign in securely.
+- Create, update, complete, and remove personal tasks.
+- See a concise dashboard that summarizes task status.
+
+### 3.3 Success Criteria
+- The PRD is sufficient for a team to estimate and implement the MVP.
+- Core user journeys are explicitly defined from authentication through task completion.
+- API and testing expectations are clear enough to prevent scope drift in later phases.
+
+## 4. Scope
+
+### 4.1 In Scope
+- User registration, login, logout, and authenticated session handling.
+- Protected access to application pages and APIs.
+- Personal task CRUD operations.
+- Task status management, including complete and incomplete states.
+- Dashboard summary for the authenticated user's tasks.
+- Backend API requirements for auth and task flows.
+- Test expectations for unit, integration, and end-to-end coverage.
+- Responsive browser experience for common desktop and mobile viewports.
+
+### 4.2 Out Of Scope
+- Shared task lists or team collaboration.
+- Real-time synchronization across multiple clients.
+- Notifications, reminders, due-date alerts, or calendar integrations.
+- File uploads, comments, tags, or advanced categorization.
 - Native mobile applications.
-- Advanced analytics, billing, or admin back office features.
+- Admin console, billing, analytics, or multi-tenant organization features.
 
-## 3. Target Users And Personas
+## 5. Assumptions
 
-### 3.1 Persona 1: Busy Individual
-- Profile: A student or working professional managing daily personal tasks.
-- Need: Quickly capture tasks, track completion, and see what is pending today.
-- Pain Point: Loses track of tasks across notes or chat messages.
+- The MVP serves individual users only.
+- Each task belongs to exactly one authenticated user.
+- A task requires a title at minimum.
+- The dashboard is derived from the authenticated user's own task data.
+- Specific framework and infrastructure decisions will be handled in later phases.
 
-### 3.2 Persona 2: Structured Planner
-- Profile: A user who prefers organizing tasks and monitoring progress over time.
-- Need: A dashboard that shows open, completed, and overdue or recent task status at a glance.
-- Pain Point: Existing simple checklist tools do not provide enough visibility.
+## 6. User Personas
 
-### 3.3 Persona 3: Technical Maintainer
-- Profile: A developer or internal team member responsible for maintaining the application.
-- Need: Clear API boundaries and sufficient automated tests to support safe iteration.
-- Pain Point: Low-confidence changes when requirements and coverage are unclear.
+### 6.1 Busy Individual
+- Profile: Student or professional managing daily personal tasks.
+- Goals: Quickly capture tasks and track what still needs attention.
+- Pain Points: Tasks are scattered across multiple tools and easy to forget.
 
-## 4. User Stories
+### 6.2 Structured Planner
+- Profile: User who wants visibility into progress and completion trends.
+- Goals: Review open versus completed work from one summary screen.
+- Pain Points: Simple checklists do not provide enough context or status visibility.
 
-### 4.1 Authentication
-- As a new user, I want to create an account so that I can securely access my tasks later.
-- As a returning user, I want to sign in and sign out so that my task data remains private.
-- As an unauthenticated visitor, I want protected pages to require login so that access control is enforced.
+### 6.3 Product Maintainer
+- Profile: Developer or technical owner responsible for delivery and future changes.
+- Goals: Work from a clear functional scope with predictable API behavior and test expectations.
+- Pain Points: Ambiguous requirements increase rework and regression risk.
 
-### 4.2 Task Management
-- As an authenticated user, I want to create a todo item so that I can remember work I need to do.
-- As an authenticated user, I want to view my todo list so that I can understand what is pending and completed.
-- As an authenticated user, I want to edit a task so that I can correct or refine what needs to be done.
-- As an authenticated user, I want to mark a task complete or incomplete so that I can track progress.
-- As an authenticated user, I want to delete a task so that I can remove items that are no longer relevant.
+## 7. User Stories
 
-### 4.3 Dashboard
-- As an authenticated user, I want a dashboard summary so that I can quickly see my task status at a glance.
-- As an authenticated user, I want to see recent or prioritized tasks on the dashboard so that I can act on the most relevant items first.
+### 7.1 Authentication
+- As a new user, I want to create an account so that I can save my tasks securely.
+- As a returning user, I want to sign in so that I can continue managing my tasks.
+- As an authenticated user, I want to sign out so that my account is protected on shared devices.
+- As an unauthenticated visitor, I want protected pages to require authentication so that task data stays private.
 
-### 4.4 Reliability And Quality
-- As a maintainer, I want automated tests for core flows so that regressions are caught early.
-- As a maintainer, I want documented API expectations so that frontend and backend integration remains consistent.
+### 7.2 Task Management
+- As an authenticated user, I want to create a new task so that I can capture work I need to do.
+- As an authenticated user, I want to see my tasks so that I can review what is pending and what is done.
+- As an authenticated user, I want to edit a task so that I can correct or refine its details.
+- As an authenticated user, I want to mark a task complete or incomplete so that I can track progress accurately.
+- As an authenticated user, I want to delete a task so that I can remove tasks that are no longer relevant.
 
-## 5. Functional Requirements
+### 7.3 Dashboard
+- As an authenticated user, I want a dashboard summary so that I can understand my workload at a glance.
+- As an authenticated user, I want to see a short list of recent or priority tasks so that I can decide what to do next.
 
-### 5.1 Authentication Requirements
-- The system must allow users to register with required credentials.
-- The system must allow users to authenticate with valid credentials.
-- The system must maintain authenticated session state or token-based access for protected resources.
-- The system must restrict todo and dashboard access to authenticated users only.
-- The system must allow users to sign out.
+### 7.4 Quality And Delivery
+- As a maintainer, I want core behaviors covered by automated tests so that changes can be made safely.
+- As a maintainer, I want clearly defined API expectations so that frontend and backend work can proceed consistently.
 
-### 5.2 Todo Requirements
-- The system must allow an authenticated user to create a todo item with at least a title.
-- The system must allow an authenticated user to list only their own todo items.
-- The system must allow an authenticated user to update a todo item they own.
-- The system must allow an authenticated user to mark a todo item as complete or incomplete.
-- The system must allow an authenticated user to delete a todo item they own.
+## 8. Functional Requirements
 
-### 5.3 Dashboard Requirements
-- The system must provide a dashboard for authenticated users.
-- The dashboard must display summary metrics such as total, active, and completed tasks.
-- The dashboard should display a recent, upcoming, or otherwise prioritized subset of tasks.
+### 8.1 Authentication Requirements
+- The system must allow a new user to register with required credentials.
+- The system must allow an existing user to authenticate with valid credentials.
+- The system must reject invalid authentication attempts with a clear error response.
+- The system must maintain authenticated access through a session or token-based mechanism.
+- The system must prevent unauthenticated access to protected pages and protected API routes.
+- The system must allow an authenticated user to log out.
 
-### 5.4 API Requirements
-- The system must expose API endpoints for authentication flows.
-- The system must expose API endpoints for todo CRUD operations.
-- API responses must use consistent status codes and structured error responses.
-- APIs must enforce authorization so users cannot access or modify other users' data.
+### 8.2 Task Requirements
+- The system must allow an authenticated user to create a task with at least a title.
+- The system must allow an authenticated user to list only tasks they own.
+- The system must allow an authenticated user to view task details needed for the UI.
+- The system must allow an authenticated user to update a task they own.
+- The system must allow an authenticated user to toggle a task between complete and incomplete states.
+- The system must allow an authenticated user to delete a task they own.
 
-### 5.5 Testing Requirements
-- The project must define unit tests for critical business logic.
-- The project must define API or integration tests for authentication and todo flows.
-- The project must define frontend tests for primary user journeys or core UI states.
+### 8.3 Dashboard Requirements
+- The system must provide a dashboard view for authenticated users.
+- The dashboard must display task summary metrics at minimum for total, active, and completed tasks.
+- The dashboard should display a focused list of recent or actionable tasks.
+- Dashboard data must reflect only the authenticated user's tasks.
 
-## 6. Non-Functional Requirements
+### 8.4 API Requirements
+- The system must expose auth endpoints required for registration, login, logout, and current-session validation.
+- The system must expose task endpoints required for create, read, update, and delete flows.
+- API responses must use standard HTTP status codes.
+- API responses must return structured success and error payloads.
+- API authorization must prevent users from reading or mutating another user's tasks.
 
-- Security: Authentication, authorization, password handling, and protected routes must follow common web security practices.
-- Performance: Primary dashboard and todo list views should load within an acceptable user-perceived time on typical broadband and mobile conditions.
-- Usability: The interface must be simple, clear, and easy to navigate for first-time users.
-- Reliability: Core flows including sign in, task creation, and task completion should behave consistently without data loss.
-- Maintainability: The codebase should separate frontend, backend, and API responsibilities clearly enough to support future iteration.
-- Testability: The architecture should enable automated unit, integration, and UI testing for critical paths.
-- Responsiveness: The web application should remain usable on desktop and mobile viewport sizes.
-- Accessibility: Basic accessibility expectations should be met for forms, navigation, labels, and keyboard interaction.
+### 8.5 Testing Requirements
+- The project must define unit tests for critical validation and business logic.
+- The project must define integration or API tests for authentication and task flows.
+- The project must define end-to-end coverage for the main user journey from login to task management.
+- The project must define a minimum test strategy for both successful and failure scenarios.
 
-## 7. Assumptions
+## 9. Information Architecture And Feature Framing
 
-- The first release targets a single-user task ownership model per account.
-- A todo item requires at minimum a title and completion status.
-- Dashboard metrics are derived from the authenticated user's own tasks.
-- Exact technology choices are intentionally deferred to later design and implementation phases.
+### 9.1 Core Screens
+- Landing or entry page
+- Sign up page
+- Login page
+- Dashboard page
+- Task list or task management page
 
-## 8. Acceptance Criteria
+### 9.2 Core Entities
+- User
+- Task
 
-### 8.1 Documentation Deliverable
-- A PRD exists at `docs/PRD.md`.
-- The document covers scope, user personas, user stories, non-functional requirements, and acceptance criteria.
-- The document remains design-only and does not include production code changes.
+### 9.3 Task Data Model Expectations
+At minimum, a task should include:
+- unique identifier,
+- owner reference,
+- title,
+- completion status,
+- created timestamp,
+- updated timestamp.
 
-### 8.2 Product Readiness Criteria
-- Authentication flows required for registration, login, logout, and protected access are defined.
-- Todo management requirements for create, read, update, complete, and delete are defined.
-- Dashboard expectations for task summary visibility are defined.
-- API expectations for auth and todo operations are defined.
-- Testing expectations across core system layers are defined.
+Optional fields such as description or due date may be considered in later phases, but they are not required for the MVP defined here.
 
-## 9. Success Metrics
+## 10. API Capability Outline
 
-- Users can complete the core journey from sign up to task completion without external assistance.
-- Maintainers can identify required product scope and system behaviors from a single document.
-- The document provides enough clarity to guide later HLD, API contract, implementation, and testing tasks.
+This section defines capability expectations, not final endpoint contracts.
+
+### 10.1 Authentication Capability
+- Register a user account.
+- Log a user in.
+- Log a user out.
+- Retrieve the current authenticated user session.
+
+### 10.2 Task Capability
+- Create a task.
+- List the authenticated user's tasks.
+- Update a task.
+- Delete a task.
+- Change completion status.
+
+### 10.3 API Design Expectations
+- Authentication and task resources should be separated clearly.
+- Errors should be predictable and machine-readable.
+- Authorization should be enforced server-side, not only in the UI.
+- API contracts should be stable enough for frontend development to proceed independently once formalized.
+
+## 11. Non-Functional Requirements
+
+### 11.1 Security
+- Passwords must never be stored in plain text.
+- Protected routes and APIs must require authentication.
+- User data isolation must be enforced for all task operations.
+- Common web security practices should be followed for session handling, validation, and error exposure.
+
+### 11.2 Performance
+- The dashboard and task list should load within acceptable interactive time for a typical consumer web application.
+- Basic task actions such as create, update, complete, and delete should feel responsive under normal load.
+
+### 11.3 Reliability
+- Core user actions must complete consistently without silent data loss.
+- Repeated refreshes or new sessions should preserve the authenticated user's saved tasks.
+
+### 11.4 Usability
+- The interface should be simple enough for a first-time user to understand without guidance.
+- Navigation between auth, dashboard, and task management should be direct and predictable.
+
+### 11.5 Accessibility
+- Forms must have labels and clear validation feedback.
+- The application must support keyboard navigation for primary actions.
+- Color usage must preserve readability for common accessibility needs.
+
+### 11.6 Maintainability
+- Requirements should support clear separation between frontend, backend, and API layers.
+- The system design should be testable and extensible without major rework for basic future enhancements.
+
+### 11.7 Testability
+- The architecture should allow automated unit, integration, and end-to-end testing.
+- Critical flows should be verifiable in CI without manual setup beyond documented environment configuration.
+
+## 12. Constraints
+
+- This phase must deliver documentation only.
+- No production code, implementation scaffolding, or runtime features may be added in this phase.
+- The PRD must be specific enough to support downstream architecture and implementation tasks.
+
+## 13. MVP Acceptance Criteria
+
+### 13.1 Documentation Acceptance Criteria
+- A product requirements document exists at `docs/PRD.md`.
+- The PRD includes scope, personas, user stories, non-functional requirements, and acceptance criteria.
+- The PRD explicitly states that this phase is documentation-only.
+
+### 13.2 Authentication Acceptance Criteria
+- The MVP defines registration, login, logout, and protected access behavior.
+- Authentication requirements include both successful and failed login scenarios.
+- Protected resources are defined as inaccessible to unauthenticated users.
+
+### 13.3 Task Management Acceptance Criteria
+- The MVP defines create, list, update, complete, uncomplete, and delete task behavior.
+- Task ownership boundaries are explicit.
+- The minimum task data required for the MVP is documented.
+
+### 13.4 Dashboard Acceptance Criteria
+- The MVP defines a dashboard for authenticated users.
+- The dashboard includes summary counts for total, active, and completed tasks.
+- The dashboard includes a concise list of relevant tasks for quick review.
+
+### 13.5 API Acceptance Criteria
+- The MVP defines required auth and task API capabilities.
+- The PRD states that API responses must use standard status codes and structured errors.
+- The PRD states that authorization must be enforced server-side.
+
+### 13.6 Testing Acceptance Criteria
+- The MVP defines expectations for unit, integration, and end-to-end testing.
+- The PRD identifies core flows that require test coverage.
+- Failure scenarios are included in test expectations for authentication and task operations.
+
+## 14. Risks And Open Questions
+
+### 14.1 Risks
+- Leaving task fields too loosely defined may cause downstream API and UI misalignment.
+- Deferring auth mechanism details to later phases may introduce implementation tradeoffs that affect frontend behavior.
+- If test scope is not kept focused on critical paths, delivery effort may expand unnecessarily.
+
+### 14.2 Open Questions For Later Phases
+- Will the MVP use session-based auth or token-based auth?
+- Will tasks include optional fields such as description or due date in the first implementation iteration?
+- What exact dashboard sorting logic should define "recent" or "priority" tasks?
+- What test stack and CI workflow will be used in implementation phases?
+
+## 15. Delivery Checklist
+
+- `docs/PRD.md` is present and complete.
+- The document covers product scope and exclusions.
+- The document defines personas and user stories.
+- The document defines functional and non-functional requirements.
+- The document defines acceptance criteria for MVP handoff.
+- No production code changes are included in this phase.
