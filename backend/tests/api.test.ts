@@ -156,6 +156,34 @@ describe("todo and dashboard api", () => {
     });
   });
 
+  it("defaults todo listing to updatedAt_desc when sort is omitted", async () => {
+    const app = makeApp();
+
+    const authResponse = await request(app).post("/api/v1/auth/register").send({
+      email: "sort@example.com",
+      password: "StrongPass123",
+    });
+    const cookie = authResponse.headers["set-cookie"];
+
+    const firstTodo = await request(app).post("/api/v1/todos").set("Cookie", cookie).send({
+      title: "First todo",
+    });
+
+    await request(app).post("/api/v1/todos").set("Cookie", cookie).send({
+      title: "Second todo",
+    });
+
+    await request(app).patch(`/api/v1/todos/${firstTodo.body.data.todo.id}`).set("Cookie", cookie).send({
+      title: "First todo updated",
+    });
+
+    const response = await request(app).get("/api/v1/todos").set("Cookie", cookie);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.items).toHaveLength(2);
+    expect(response.body.data.items[0].title).toBe("First todo updated");
+  });
+
   it("isolates ownership across two authenticated users", async () => {
     const app = makeApp();
 
